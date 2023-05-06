@@ -23,17 +23,32 @@ class User(models.Model):
     def __str__(self) -> str:
         return self.username
 
+
+class Profile(models.Model):
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+    )
+    friends = models.ManyToManyField(
+        User,
+        related_name='friends',
+        blank=True,
+        on_delete=models.CASCADE,
+    )
+
+
 class FriendshipRequest(models.Model):
     sender = models.ForeignKey(
         User,
         related_name='f_requests',
-        on_delete=models.CASCADE
+        on_delete=models.CASCADE,
     )
     recipient = models.ForeignKey(
         User,
         related_name='f_requests',
-        on_delete=models.CASCADE
+        on_delete=models.CASCADE,
     )
+    # status = models.Choices()
 
     class Meta:
         ordering = ('sender',)
@@ -41,7 +56,4 @@ class FriendshipRequest(models.Model):
         verbose_name_plural = 'Заявки в друзья'
 
     def __str__(self) -> str:
-        return f'Заявка в дрзуья от {self.sender} отправлена {self.recipient}'
-
-class Friends(models.Model):
-    pass
+        return f'Заявка в друзья от {self.sender} отправлена {self.recipient}'
