@@ -23,6 +23,7 @@ from api.permissions import (
 from api.serializers import (
     UserSerializer,
     ProfileSerializer,
+    ProfileCreateUpdateSerializer,
 )
 from friends.models import User, Profile, FriendshipRequest
 
@@ -68,14 +69,17 @@ class UserViewSet(viewsets.ModelViewSet):
         return Response(serializer.data)
 
 
-class ProfileViewSet():
+class ProfileViewSet(viewsets.ModelViewSet):
     http_method_names = ('get', 'post', 'delete', 'patch')
     queryset = Profile.objects.all()
     serializer_class = ProfileSerializer
-    lookup_field = 'username'
+    lookup_field = 'user'
 #    permission_classes = (IsAdminAuthorOrReadOnly,)
-    filter_backends = (filters.SearchFilter,)
-    search_fields = ('username',)
+
+    def get_serializer_class(self):
+        if self.action in ("create", "partial_update"):
+            return ProfileCreateUpdateSerializer
+        return ProfileSerializer
 
 
 class FriendshipRequestViewSet():
