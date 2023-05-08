@@ -21,6 +21,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'rest_framework',
+    'drf_yasg',
     'friends.apps.FriendsConfig',
     'api.apps.ApiConfig',
 ]
@@ -83,6 +85,11 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+# Swagger settings
+
+SWAGGER_SETTINGS = {
+   'DEFAULT_INFO': 'import.path.to.urls.api_info',
+}
 
 # Internationalization
 

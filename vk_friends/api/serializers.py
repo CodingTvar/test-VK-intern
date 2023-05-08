@@ -11,7 +11,7 @@ from friends.validators import username_validator, validate_of_date
 class UsernameSerializer(serializers.Serializer):
     username = serializers.CharField(
         max_length=settings.MAX_LENGTH_USERNAME,
-        required=True
+        required=True,
     )
 
     def validate_username(self, value):
@@ -34,6 +34,7 @@ class UserSerializer(UsernameSerializer, serializers.ModelSerializer):
 class ProfileSerializer(serializers.ModelSerializer):
     user = SlugRelatedField(
         slug_field='username',
+        read_only=True,
         default=serializers.CurrentUserDefault(),
     )
     friends = UserSerializer(many=True)
@@ -41,7 +42,6 @@ class ProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = Profile
         fields = ('id', 'user', 'friends', 'date_update', 'date_create')
-        read_only_fields = ('user',)
 
     def validate_date_update(self, data):
         return validate_of_date(data)
@@ -50,10 +50,12 @@ class ProfileSerializer(serializers.ModelSerializer):
 class FriendshipRequestSerializer(serializers.ModelSerializer):
     sender = SlugRelatedField(
         slug_field='username',
+        read_only=True,
         default=serializers.CurrentUserDefault(),
     )
     recipient = SlugRelatedField(
         slug_field='username',
+        read_only=True,
         default=serializers.CurrentUserDefault(),
     )
 

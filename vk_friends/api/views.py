@@ -11,6 +11,7 @@ from rest_framework import (
 )
 from rest_framework.decorators import action
 from rest_framework.permissions import AllowAny, IsAuthenticated
+# from rest_framework import status
 from rest_framework.response import Response
 
 from api.permissions import (
@@ -20,6 +21,7 @@ from api.permissions import (
 )
 from api.serializers import (
     UserSerializer,
+    UsernameSerializer,
 )
 from friends.models import User, Profile, FriendshipRequest
 
@@ -28,7 +30,7 @@ class SignUpView(views.APIView):
     permission_classes = (AllowAny,)
 
     def post(self, request):
-        serializer = UserSerializer(data=request.data)
+        serializer = UsernameSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         username = serializer.validated_data['username']
         try:
