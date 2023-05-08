@@ -1,7 +1,7 @@
 from django.conf import settings
 from django.db import models
 
-from friends.validators import username_validator
+from friends.validators import username_validator, validate_of_date
 
 
 class User(models.Model):
@@ -38,11 +38,13 @@ class Profile(models.Model):
     )
     date_update = models.DateTimeField(
         verbose_name='Дата обновления',
-        auto_now=True
+        auto_now=True,
+        validators=[validate_of_date],
     )
     date_create = models.DateTimeField(
         verbose_name='Дата создания',
-        auto_now_add=True
+        auto_now_add=True,
+        validators=[validate_of_date],
     )
 
     class Meta:
@@ -55,9 +57,8 @@ class Profile(models.Model):
 
 
 STATUS_CHOICES = (
-    ('', ''),
-    ('', ''),
-    ('', ''),
+    ('send', 'отправить'),
+    ('accept', 'принять'),
 )
 
 
@@ -82,10 +83,12 @@ class FriendshipRequest(models.Model):
     date_update = models.DateTimeField(
         verbose_name='Дата обновления',
         auto_now=True,
+        validators=[validate_of_date],
     )
     date_sending = models.DateTimeField(
         verbose_name='Дата отправки',
         auto_now_add=True,
+        validators=[validate_of_date],
     )
 
     class Meta:

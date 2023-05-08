@@ -14,3 +14,12 @@ def username_validator(value):
             f"Недопустимые символы в имени пользователя: {restr_symb}"
         )
     return value
+
+def validate_of_date(value):
+    current_date = timezone.now()
+    if value > current_date:
+        raise ValidationError(
+            f"Указанная дата {value} не может быть больше текущей даты "
+            f"{current_date}.",
+        )
+    return value
