@@ -21,8 +21,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'friends.apps.FriendsConfig',
     'api.apps.ApiConfig',
-    'friends.apps.ApiConfig'
 ]
 
 MIDDLEWARE = [

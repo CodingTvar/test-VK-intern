@@ -35,7 +35,6 @@ class Profile(models.Model):
         verbose_name='Друзья',
         related_name='friends',
         blank=True,
-        on_delete=models.CASCADE,
     )
     date_update = models.DateTimeField(
         verbose_name='Дата обновления',
@@ -66,13 +65,13 @@ class FriendshipRequest(models.Model):
     sender = models.ForeignKey(
         User,
         verbose_name='Имя отправителя',
-        related_name='f_requests',
+        related_name='fr_sender',
         on_delete=models.CASCADE,
     )
     recipient = models.ForeignKey(
         User,
         verbose_name='Имя получателя',
-        related_name='f_requests',
+        related_name='fr_recipient',
         on_delete=models.CASCADE,
     )
     status_req = models.CharField(
