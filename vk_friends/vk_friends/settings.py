@@ -104,3 +104,15 @@ STATIC_URL = '/static/'
 # Default primary key field type
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# Constants models
+
+TEXT_STR = 30
+
+# User model
+
+MAX_LENGTH_USERNAME = 32
+
+# Relationship request model
+
+MAX_STATUS = 24
