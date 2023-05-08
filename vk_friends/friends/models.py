@@ -59,6 +59,7 @@ class Profile(models.Model):
 STATUS_CHOICES = (
     ('send', 'отправить'),
     ('accept', 'принять'),
+    ('friend', 'уже друзья'),
 )
 
 
@@ -76,7 +77,7 @@ class FriendshipRequest(models.Model):
         on_delete=models.CASCADE,
     )
     status_req = models.CharField(
-        verbose_name='',
+        verbose_name='Статус заявки',
         max_length=settings.MAX_STATUS,
         choices=STATUS_CHOICES,
     )
@@ -101,6 +102,6 @@ class FriendshipRequest(models.Model):
         verbose_name_plural = 'Заявки в друзья'
 
     def __str__(self) -> str:
-        return (f'Заявка в друзья от {self.sender[:settings.TEXT_STR]} '
-                f'отправлена {self.recipient[:settings.TEXT_STR]} '
-                f'со статусом {self.recipient[:settings.TEXT_STR]}')
+        return (f'Заявка в друзья от {self.sender} '
+                f'отправлена {self.recipient} '
+                f'со статусом {self.status_req}')

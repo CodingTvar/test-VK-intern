@@ -8,11 +8,15 @@ from friends.models import User, Profile, FriendshipRequest
 from friends.validators import username_validator, validate_of_date
 
 
-class UsernameSerializer(serializers.Serializer):
+class UserSerializer(serializers.ModelSerializer):
     username = serializers.CharField(
         max_length=settings.MAX_LENGTH_USERNAME,
         required=True,
     )
+
+    class Meta:
+        model = User
+        fields = ('username',)
 
     def validate_username(self, value):
         if (
@@ -23,12 +27,6 @@ class UsernameSerializer(serializers.Serializer):
                 f'Пользователь с именем {value} уже существует'
             )
         return username_validator(value)
-
-
-class UserSerializer(UsernameSerializer, serializers.ModelSerializer):
-    class Meta:
-        model = User
-        fields = ('username',)
 
 
 class ProfileSerializer(serializers.ModelSerializer):

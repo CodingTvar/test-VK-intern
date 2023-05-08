@@ -1,13 +1,14 @@
 from django.conf import settings
 from django.db import IntegrityError
-# from django.shortcuts import get_object_or_404
+from django.shortcuts import get_object_or_404
 from rest_framework import (
     filters,
     mixins,
     serializers,
     status,
     views,
-    viewsets
+    viewsets,
+    generics,
 )
 from rest_framework.decorators import action
 from rest_framework.permissions import AllowAny, IsAuthenticated
@@ -21,26 +22,23 @@ from api.permissions import (
 )
 from api.serializers import (
     UserSerializer,
-    UsernameSerializer,
+    ProfileSerializer,
 )
 from friends.models import User, Profile, FriendshipRequest
 
 
-class SignUpView(views.APIView):
-    permission_classes = (AllowAny,)
+class SignUpViewSet(generics.CreateAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+#    permission_classes = (AllowAny,)
 
-    def post(self, request):
-        serializer = UsernameSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        username = serializer.validated_data['username']
-        try:
-            user, _ = User.objects.get_or_create(username=username,)
-        except IntegrityError:
-            raise serializers.ValidationError(
-                {'message': 'Пользователь с такими данными уже существует'}
-            )
-        user.save()
-        return Response(serializer.data)
+    def post(self, request, *args, **kwargs):
+        serializer = UserSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(status=status.HTTP_201_CREATED)
+        else:
+            return Response(serializer.errors)
 
 
 class UserViewSet(viewsets.ModelViewSet):
@@ -48,7 +46,7 @@ class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
     lookup_field = 'username'
-    permission_classes = (IsAdminOrReadOnly,)
+#    permission_classes = (IsAdminAuthorOrReadOnly,)
     filter_backends = (filters.SearchFilter,)
     search_fields = ('username',)
 
@@ -71,7 +69,13 @@ class UserViewSet(viewsets.ModelViewSet):
 
 
 class ProfileViewSet():
-    pass
+    http_method_names = ('get', 'post', 'delete', 'patch')
+    queryset = Profile.objects.all()
+    serializer_class = ProfileSerializer
+    lookup_field = 'username'
+#    permission_classes = (IsAdminAuthorOrReadOnly,)
+    filter_backends = (filters.SearchFilter,)
+    search_fields = ('username',)
 
 
 class FriendshipRequestViewSet():
