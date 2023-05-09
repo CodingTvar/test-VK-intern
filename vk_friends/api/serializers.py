@@ -3,6 +3,8 @@ from django.core.validators import MaxValueValidator, MinValueValidator
 from django.shortcuts import get_object_or_404
 from rest_framework import serializers
 from rest_framework.relations import SlugRelatedField
+from djoser.serializers import UserSerializer
+
 
 from friends.models import User, Profile, FriendshipRequest
 from friends.validators import username_validator, validate_of_date
@@ -31,7 +33,6 @@ class UserSerializer(serializers.ModelSerializer):
 
 class ProfileCreateUpdateSerializer(serializers.ModelSerializer):
     user = serializers.SlugRelatedField(
-#        queryset=User.objects.all(),
         read_only=True,
         slug_field='username',
     )
@@ -51,10 +52,8 @@ class ProfileCreateUpdateSerializer(serializers.ModelSerializer):
 
 
 class ProfileSerializer(serializers.ModelSerializer):
-    user = serializers.SlugRelatedField(
-#        queryset=User.objects.all(),
+    user = UserSerializer(
         read_only=True,
-        slug_field='username',
     )
     friends = UserSerializer(
         read_only=True,
@@ -95,7 +94,7 @@ class FriendshipRequestSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = FriendshipRequest
-        fields = ('id', 'sender', 'recipient', 'status_req', 'date_update', 'date_sending')
+        fields = ('sender', 'recipient', 'status_req', 'date_update', 'date_sending')
         read_only_fields = ('sender',)
 
     def validate(self, data):
@@ -104,7 +103,7 @@ class FriendshipRequestSerializer(serializers.ModelSerializer):
             return data
         friendship_id = self.context.get('view').kwargs.get('id')
         friendship = get_object_or_404(FriendshipRequest, pk=friendship_id)
-        recipient = 0
+        recipient = friendship.fr_recipient.filter(sender=request.user)
         if friendship.fr_sender.filter(recipient=recipient):
             raise serializers.ValidationError(
                 'Вы не можете отправлять '
