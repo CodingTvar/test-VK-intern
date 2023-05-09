@@ -106,7 +106,7 @@ class ProfileUsersViewSet(viewsets.ReadOnlyModelViewSet):
             )
         except IntegrityError:
             raise serializers.ValidationError(
-                {'message': 'Такая завка уже есть'}
+                {'message': 'Такая заявка уже есть'}
             )
         frequest.save()
         return Response(serializer.data)
