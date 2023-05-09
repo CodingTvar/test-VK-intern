@@ -11,10 +11,10 @@ from rest_framework import (
     generics,
 )
 from rest_framework.decorators import action
-from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 
-from api.permissions import IsAdmin
+from api.permissions import IsAdmin, IsAdminOrReadOnly
 from api.serializers import (
     UserSerializer,
     ProfileSerializer,
@@ -29,7 +29,7 @@ class SignUpViewSet(generics.CreateAPIView):
     serializer_class = UserSerializer
     permission_classes = (AllowAny,)
 
-    def post(self, request, *args, **kwargs):
+    def post(self, request):
         serializer = UserSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
@@ -43,58 +43,29 @@ class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
     lookup_field = 'username'
-    permission_classes = (IsAdmin,)
+    permission_classes = (IsAdminOrReadOnly,)
     filter_backends = (filters.SearchFilter,)
     search_fields = ('username',)
 
 
 class ProfileViewSet(viewsets.ModelViewSet):
-    http_method_names = ('get', 'delete', 'patch')
+    http_method_names = ('get','post', 'delete', 'patch')
     queryset = Profile.objects.all()
     serializer_class = ProfileSerializer
     lookup_field = 'user'
     permission_classes = (AllowAny,) # IsAdminAuthorOrReadOnly c аутентификацией
 
     def get_serializer_class(self):
-        if self.action in ('partial_update'):
+        if self.action in ('create', 'partial_update'):
             return ProfileCreateUpdateSerializer
         return ProfileSerializer
 
-    def destroy(self, request):
-        
-        return Response()
-
-
-class GetDeleteFriendViewSet(viewsets.ModelViewSet):
-    http_method_names = ('get', 'delete')
-    serializer_class = UserSerializer
-    lookup_field = 'user'
-    permission_classes = (AllowAny,)
-
-    def get_queryset(self):
-        return Profile.friends.filter(pk=self.kwargs.get('profile_id'))
-
-    def destroy(self, request, *args, **kwargs):
-        serializer_prof = ProfileSerializer(data=request.data)
-        serializer_req = FriendshipRequestSerializer(
-            data=FriendshipRequest.objects.filter(sender=request.user))
-        return Response()
-
-
-class ProfileUsersViewSet(viewsets.ReadOnlyModelViewSet):
-    queryset = User.objects.all()
-    serializer_class = UserSerializer
-    lookup_field = 'user'
-    permission_classes = (IsAuthenticated,)
-
     @action(detail=False,
             methods=['POST'],
-            permission_classes=(IsAuthenticated,),
-            url_path=r'(?P<user_id>\d+)/send_request/')
+#            permission_classes=(IsAuthenticated,),
+            url_path=r'(?P<user_id>\d+)/send_request')
     def send_request(self, request):
         serializer = FriendshipRequestSerializer(
-            request.user,
-            data=request.data,
         )
         serializer.is_valid(raise_exception=True)
         sender = serializer.validated_data['sender']
@@ -111,3 +82,18 @@ class ProfileUsersViewSet(viewsets.ReadOnlyModelViewSet):
         frequest.save()
         return Response(serializer.data)
 
+
+class GetDeleteFriendViewSet(viewsets.ModelViewSet):
+    http_method_names = ('get', 'delete')
+    serializer_class = UserSerializer
+    lookup_field = 'user'
+    permission_classes = (AllowAny,)
+
+    def get_queryset(self):
+        return Profile.friends.filter(pk=self.kwargs.get('profile_id'))
+
+    def destroy(self, request, *args, **kwargs):
+        serializer_prof = ProfileSerializer(data=request.data)
+        serializer_req = FriendshipRequestSerializer(
+            data=FriendshipRequest.objects.filter(sender=request.user))
+        return Response()

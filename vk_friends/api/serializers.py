@@ -33,12 +33,13 @@ class UserSerializer(serializers.ModelSerializer):
 
 class ProfileCreateUpdateSerializer(serializers.ModelSerializer):
     user = serializers.SlugRelatedField(
-        read_only=True,
+        queryset=User.objects.all(),
         slug_field='username',
     )
-    friends = UserSerializer(
+    friends = serializers.SlugRelatedField(
         read_only=True,
-        many=True
+        slug_field='username',
+        many=True,
     )
 
     class Meta:
@@ -48,6 +49,14 @@ class ProfileCreateUpdateSerializer(serializers.ModelSerializer):
     def validate(self, data):
         if data == ('date_update' or 'date_create'):
             return validate_of_date(data)
+        request = self.context.get('request')
+        if request.method != 'POST':
+            return data
+        if Profile.objects.filter(user=data['user']):
+            raise serializers.ValidationError(
+                'Вы не можете создавать '
+                'больше одного профиля'
+            )
         return data
 
 
@@ -67,16 +76,6 @@ class ProfileSerializer(serializers.ModelSerializer):
     def validate(self, data):
         if data == ('date_update' or 'date_create'):
             return validate_of_date(data)
-        request = self.context.get('request')
-        if request.method != 'POST':
-            return data
-        profile_id = self.context.get('view').kwargs.get('id')
-        profile = get_object_or_404(Profile, pk=profile_id)
-        if profile.objects.filter(user=request.user):
-            raise serializers.ValidationError(
-                'Вы не можете создать '
-                'больше одного профиля'
-            )
         return data
 
 
