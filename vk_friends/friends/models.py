@@ -66,6 +66,9 @@ class Profile(models.Model):
     def __str__(self) -> str:
         return self.user[:settings.TEXT_STR]
 
+    def get_friends(self):
+        return self.friends.all()
+
 
 class FriendshipRequest(models.Model):
     sender = models.ForeignKey(
