@@ -121,6 +121,3 @@ class FriendshipRequest(models.Model):
     
     def get_status_req(self):
         return self.status_req
-
-    def reject_status_req(self):
-        return self.status_req['rejected']
