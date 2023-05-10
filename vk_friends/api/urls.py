@@ -20,7 +20,7 @@ router_v1.register(r'users/(?P<user_id>\d+)/send_requests',
                    basename='send_requests')
 router_v1.register(r'users/(?P<user_id>\d+)/incoming_requests',
                    IncomeRequestsViewSet,
-                   basename='send_requests')
+                   basename='incoming_requests')
 
 auth_patterns = [
     path('signup/', SignUpViewSet.as_view())

@@ -118,6 +118,33 @@ class SendRequestsViewSet(viewsets.ReadOnlyModelViewSet):
     def get_queryset(self):
         return FriendshipRequest.objects.filter(sender=self.get_user())
 
+    @action(
+        detail=False,
+        methods=['POST'],
+        url_path=r'(?P<recipient_id>\d+)/send_request',
+    )
+    def send_request(self, request, **kwargs):
+        data = {
+            'sender': self.get_user(),
+            'recipient': get_object_or_404(User, pk=self.kwargs.get('recipient_id')),
+        }
+        serializer = self.get_serializer(data=data)
+        serializer.is_valid(raise_exception=True)
+        sender = serializer.validated_data['sender']
+        recipient = serializer.validated_data['recipient']
+        try:
+            frequest = FriendshipRequest.objects.create(
+                sender=sender,
+                recipient=recipient,
+                status_req='send',
+            )
+        except IntegrityError:
+            raise serializers.ValidationError(
+                {'message': 'Такая заявка уже есть'}
+            )
+        frequest.save()
+        return Response(serializer.data)
+
 
 class IncomeRequestsViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = FriendshipRequestSerializer
