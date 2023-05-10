@@ -6,7 +6,7 @@ from rest_framework.relations import SlugRelatedField
 from djoser.serializers import UserSerializer
 
 
-from friends.models import User, Profile, FriendshipRequest
+from friends.models import User, Profile, FriendshipRequest, STATUS_CHOICES
 from friends.validators import username_validator, validate_of_date
 
 
@@ -81,8 +81,8 @@ class ProfileSerializer(serializers.ModelSerializer):
 
 class FriendshipRequestSerializer(serializers.ModelSerializer):
     sender = SlugRelatedField(
+        queryset=User.objects.all(),
         slug_field='username',
-        read_only=True,
         default=serializers.CurrentUserDefault(),
     )
     recipient = SlugRelatedField(
@@ -90,6 +90,9 @@ class FriendshipRequestSerializer(serializers.ModelSerializer):
         slug_field='username',
         default=serializers.CurrentUserDefault(),
     )
+    status_req = serializers.ChoiceField(
+        read_only=True,
+        choices=STATUS_CHOICES)
 
     class Meta:
         model = FriendshipRequest
@@ -100,10 +103,14 @@ class FriendshipRequestSerializer(serializers.ModelSerializer):
         request = self.context.get('request')
         if request.method != 'POST':
             return data
+        print(data)
+        if data['sender'] == data['recipient']:
+            raise serializers.ValidationError(
+                'Вы не можете отправлять себе заявку в друзья'
+            )
         friendship_id = self.context.get('view').kwargs.get('id')
-        friendship = get_object_or_404(FriendshipRequest, pk=friendship_id)
-        recipient = friendship.fr_recipient.filter(sender=request.user)
-        if friendship.fr_sender.filter(recipient=recipient):
+        friendship = FriendshipRequest.objects.filter(pk=friendship_id)
+        if friendship.filter(sender=data['sender'], recipient=data['recipient']):
             raise serializers.ValidationError(
                 'Вы не можете отправлять '
                 'больше одной заявки в друзья'

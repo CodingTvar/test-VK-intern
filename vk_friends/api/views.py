@@ -14,7 +14,7 @@ from rest_framework.decorators import action
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 
-from api.permissions import IsAdmin, IsAdminOrReadOnly
+from api.permissions import IsAdminOrReadOnly
 from api.serializers import (
     UserSerializer,
     ProfileSerializer,
@@ -60,28 +60,6 @@ class ProfileViewSet(viewsets.ModelViewSet):
             return ProfileCreateUpdateSerializer
         return ProfileSerializer
 
-    @action(detail=False,
-            methods=['POST'],
-#            permission_classes=(IsAuthenticated,),
-            url_path=r'(?P<user_id>\d+)/send_request')
-    def send_request(self, request):
-        serializer = FriendshipRequestSerializer(
-        )
-        serializer.is_valid(raise_exception=True)
-        sender = serializer.validated_data['sender']
-        recipient = serializer.validated_data['recipient']
-        try:
-            frequest, _ = FriendshipRequest.objects.create(
-                sender=sender,
-                recipient=recipient,
-            )
-        except IntegrityError:
-            raise serializers.ValidationError(
-                {'message': 'Такая заявка уже есть'}
-            )
-        frequest.save()
-        return Response(serializer.data)
-
 
 class GetDeleteFriendViewSet(viewsets.ModelViewSet):
     http_method_names = ('get', 'delete')
@@ -97,3 +75,40 @@ class GetDeleteFriendViewSet(viewsets.ModelViewSet):
         serializer_req = FriendshipRequestSerializer(
             data=FriendshipRequest.objects.filter(sender=request.user))
         return Response()
+
+
+class RequestsViewSet(viewsets.ReadOnlyModelViewSet):
+    serializer_class = FriendshipRequestSerializer
+    permission_classes = (AllowAny,) # IsAdminAuthor с аутентификацией
+
+    def get_user(self):
+        return get_object_or_404(User, pk=self.kwargs.get('user_id'))
+
+    def get_queryset(self):
+        return FriendshipRequest.objects.filter(sender=self.get_user())
+
+    @action(
+        detail=False,
+        methods=['POST']
+    )
+    def send_request(self, request, **kwargs):
+        data={
+            'sender': self.get_user(),
+            'recipient': self.request.data['recipient'],
+        }
+        serializer = self.get_serializer(data=data)
+        serializer.is_valid(raise_exception=True)
+        sender = serializer.validated_data['sender']
+        recipient = serializer.validated_data['recipient']
+        try:
+            frequest = FriendshipRequest.objects.create(
+                sender=sender,
+                recipient=recipient,
+                status_req='send',
+            )
+        except IntegrityError:
+            raise serializers.ValidationError(
+                {'message': 'Такая заявка уже есть'}
+            )
+        frequest.save()
+        return Response(serializer.data)

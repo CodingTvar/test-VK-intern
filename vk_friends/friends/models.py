@@ -4,6 +4,13 @@ from django.db import models
 from friends.validators import username_validator, validate_of_date
 
 
+STATUS_CHOICES = (
+    ('send', 'отправлен'),
+    ('incoming', 'получен'),
+    ('friend', 'уже друзья'),
+)
+
+
 class User(models.Model):
     username = models.CharField(
         verbose_name='Имя пользователя',
@@ -58,13 +65,6 @@ class Profile(models.Model):
 
     def __str__(self) -> str:
         return self.user[:settings.TEXT_STR]
-
-
-STATUS_CHOICES = (
-    ('send', 'отправить'),
-    ('accept', 'принять'),
-    ('friend', 'уже друзья'),
-)
 
 
 class FriendshipRequest(models.Model):
