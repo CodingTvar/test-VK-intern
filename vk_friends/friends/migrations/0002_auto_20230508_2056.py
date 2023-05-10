@@ -14,26 +14,45 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='friendshiprequest',
             name='date_sending',
-            field=models.DateTimeField(auto_now_add=True, validators=[friends.validators.validate_of_date], verbose_name='Дата отправки'),
+            field=models.DateTimeField(
+                auto_now_add=True,
+                validators=[friends.validators.validate_of_date],
+                verbose_name='Дата отправки'
+            ),
         ),
         migrations.AlterField(
             model_name='friendshiprequest',
             name='date_update',
-            field=models.DateTimeField(auto_now=True, validators=[friends.validators.validate_of_date], verbose_name='Дата обновления'),
+            field=models.DateTimeField(
+                auto_now=True,
+                validators=[friends.validators.validate_of_date],
+                verbose_name='Дата обновления'),
         ),
         migrations.AlterField(
             model_name='friendshiprequest',
             name='status_req',
-            field=models.CharField(choices=[('send', 'отправить'), ('accept', 'принять')], max_length=24, verbose_name=''),
+            field=models.CharField(
+                choices=[('send', 'отправить'),
+                         ('accept', 'принять')],
+                max_length=24,
+                verbose_name=''),
         ),
         migrations.AlterField(
             model_name='profile',
             name='date_create',
-            field=models.DateTimeField(auto_now_add=True, validators=[friends.validators.validate_of_date], verbose_name='Дата создания'),
+            field=models.DateTimeField(
+                auto_now_add=True,
+                validators=[friends.validators.validate_of_date],
+                verbose_name='Дата создания'
+            ),
         ),
         migrations.AlterField(
             model_name='profile',
             name='date_update',
-            field=models.DateTimeField(auto_now=True, validators=[friends.validators.validate_of_date], verbose_name='Дата обновления'),
+            field=models.DateTimeField(
+                auto_now=True,
+                validators=[friends.validators.validate_of_date],
+                verbose_name='Дата обновления'
+            ),
         ),
     ]

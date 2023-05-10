@@ -12,6 +12,9 @@ class Migration(migrations.Migration):
     operations = [
         migrations.AddConstraint(
             model_name='profile',
-            constraint=models.UniqueConstraint(fields=('user',), name='unique_user'),
+            constraint=models.UniqueConstraint(
+                fields=('user',),
+                name='unique_user'
+            ),
         ),
     ]

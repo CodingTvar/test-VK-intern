@@ -1,11 +1,13 @@
 from pathlib import Path
-from datetime import timedelta
+# from datetime import timedelta
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-)mxo(zvht(%6@x$emx(g!9u-7u+t2@rn)*6(3dbx=j^tg32eik'
+SECRET_KEY = (
+    'django-insecure-)mxo(zvht(%6@x$emx(g!9u-7u+t2@rn)*6(3dbx=j^tg32eik'
+)
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -109,7 +111,7 @@ REST_FRAMEWORK = {
         'rest_framework.permissions.AllowAny',
     ],
 
-    "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
     'PAGE_SIZE': 10,
 }
 

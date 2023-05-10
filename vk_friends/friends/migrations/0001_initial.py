@@ -16,8 +16,20 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='User',
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('username', models.CharField(error_messages={'unique': 'Пользователь с таким именем уже существует'}, max_length=32, unique=True, validators=[friends.validators.username_validator], verbose_name='Имя пользователя')),
+                ('id',
+                 models.BigAutoField(auto_created=True,
+                                     primary_key=True,
+                                     serialize=False,
+                                     verbose_name='ID')),
+                ('username',
+                 models.CharField(
+                    error_messages={
+                        'unique': 'Пользователь с таким именем уже существует'
+                    },
+                    max_length=32,
+                    unique=True,
+                    validators=[friends.validators.username_validator],
+                    verbose_name='Имя пользователя')),
             ],
             options={
                 'verbose_name': 'Пользователь',
@@ -28,11 +40,26 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='Profile',
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('date_update', models.DateTimeField(auto_now=True, verbose_name='Дата обновления')),
-                ('date_create', models.DateTimeField(auto_now_add=True, verbose_name='Дата создания')),
-                ('friends', models.ManyToManyField(blank=True, related_name='friends', to='friends.User', verbose_name='Друзья')),
-                ('user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='friends.user', verbose_name='Владелец профиля')),
+                ('id',
+                 models.BigAutoField(auto_created=True,
+                                     primary_key=True,
+                                     serialize=False,
+                                     verbose_name='ID')),
+                ('date_update',
+                 models.DateTimeField(auto_now=True,
+                                      verbose_name='Дата обновления')),
+                ('date_create',
+                 models.DateTimeField(auto_now_add=True,
+                                      verbose_name='Дата создания')),
+                ('friends',
+                 models.ManyToManyField(blank=True,
+                                        related_name='friends',
+                                        to='friends.User',
+                                        verbose_name='Друзья')),
+                ('user',
+                 models.ForeignKey(on_delete=django.db.models.deletion.CASCADE,
+                                   to='friends.user',
+                                   verbose_name='Владелец профиля')),
             ],
             options={
                 'verbose_name': 'Профиль',
@@ -43,12 +70,31 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='FriendshipRequest',
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('status_req', models.CharField(choices=[('', ''), ('', ''), ('', '')], max_length=24, verbose_name='')),
-                ('date_update', models.DateTimeField(auto_now=True, verbose_name='Дата обновления')),
-                ('date_sending', models.DateTimeField(auto_now_add=True, verbose_name='Дата отправки')),
-                ('recipient', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='fr_recipient', to='friends.user', verbose_name='Имя получателя')),
-                ('sender', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='fr_sender', to='friends.user', verbose_name='Имя отправителя')),
+                ('id',
+                 models.BigAutoField(auto_created=True,
+                                     primary_key=True,
+                                     serialize=False,
+                                     verbose_name='ID')),
+                ('status_req',
+                 models.CharField(choices=[('', ''), ('', ''), ('', '')],
+                                  max_length=24,
+                                  verbose_name='')),
+                ('date_update',
+                 models.DateTimeField(auto_now=True,
+                                      verbose_name='Дата обновления')),
+                ('date_sending',
+                 models.DateTimeField(auto_now_add=True,
+                                      verbose_name='Дата отправки')),
+                ('recipient',
+                 models.ForeignKey(on_delete=django.db.models.deletion.CASCADE,
+                                   related_name='fr_recipient',
+                                   to='friends.user',
+                                   verbose_name='Имя получателя')),
+                ('sender',
+                 models.ForeignKey(on_delete=django.db.models.deletion.CASCADE,
+                                   related_name='fr_sender',
+                                   to='friends.user',
+                                   verbose_name='Имя отправителя')),
             ],
             options={
                 'verbose_name': 'Заявка в друзья',
@@ -58,6 +104,9 @@ class Migration(migrations.Migration):
         ),
         migrations.AddConstraint(
             model_name='friendshiprequest',
-            constraint=models.UniqueConstraint(fields=('sender', 'recipient'), name='unique_sender_recipient'),
+            constraint=models.UniqueConstraint(
+                fields=('sender', 'recipient'),
+                name='unique_sender_recipient'
+            ),
         ),
     ]

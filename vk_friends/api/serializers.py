@@ -1,10 +1,7 @@
 from django.conf import settings
-from django.core.validators import MaxValueValidator, MinValueValidator
-from django.shortcuts import get_object_or_404
+# from django.shortcuts import get_object_or_404
 from rest_framework import serializers
 from rest_framework.relations import SlugRelatedField
-from djoser.serializers import UserSerializer
-
 
 from friends.models import User, Profile, FriendshipRequest, STATUS_CHOICES
 from friends.validators import username_validator, validate_of_date
@@ -96,7 +93,11 @@ class FriendshipRequestSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = FriendshipRequest
-        fields = ('sender', 'recipient', 'status_req', 'date_update', 'date_sending')
+        fields = ('sender',
+                  'recipient',
+                  'status_req',
+                  'date_update',
+                  'date_sending')
         read_only_fields = ('sender',)
 
     def validate(self, data):
@@ -110,7 +111,8 @@ class FriendshipRequestSerializer(serializers.ModelSerializer):
             )
         friendship_id = self.context.get('view').kwargs.get('id')
         friendship = FriendshipRequest.objects.filter(pk=friendship_id)
-        if friendship.filter(sender=data['sender'], recipient=data['recipient']):
+        if friendship.filter(sender=data['sender'],
+                             recipient=data['recipient']):
             raise serializers.ValidationError(
                 'Вы не можете отправлять '
                 'больше одной заявки в друзья'

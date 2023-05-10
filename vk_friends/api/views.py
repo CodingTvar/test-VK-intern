@@ -1,12 +1,11 @@
-from django.conf import settings
 from django.db import IntegrityError
 from django.shortcuts import get_object_or_404
 from rest_framework import (
     filters,
-    mixins,
+    # mixins,
     serializers,
     status,
-    views,
+    # views,
     viewsets,
     generics,
 )
@@ -49,11 +48,12 @@ class UserViewSet(viewsets.ModelViewSet):
 
 
 class ProfileViewSet(viewsets.ModelViewSet):
-    http_method_names = ('get','post', 'delete', 'patch')
+    http_method_names = ('get', 'post', 'delete', 'patch')
     queryset = Profile.objects.all()
     serializer_class = ProfileSerializer
     lookup_field = 'user'
-    permission_classes = (AllowAny,) # IsAdminAuthorOrReadOnly c аутентификацией
+    # IsAdminAuthorOrReadOnly c аутентификацией
+    permission_classes = (AllowAny,)
 
     def get_serializer_class(self):
         if self.action in ('create', 'partial_update'):
@@ -71,15 +71,16 @@ class GetDeleteFriendViewSet(viewsets.ModelViewSet):
         return Profile.friends.filter(pk=self.kwargs.get('profile_id'))
 
     def destroy(self, request, *args, **kwargs):
-        serializer_prof = ProfileSerializer(data=request.data)
-        serializer_req = FriendshipRequestSerializer(
-            data=FriendshipRequest.objects.filter(sender=request.user))
+        # serializer_prof = ProfileSerializer(data=request.data)
+        # serializer_req = FriendshipRequestSerializer(
+        #    data=FriendshipRequest.objects.filter(sender=request.user))
         return Response()
 
 
 class RequestsViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = FriendshipRequestSerializer
-    permission_classes = (AllowAny,) # IsAdminAuthor с аутентификацией
+    # IsAdminAuthor с аутентификацией
+    permission_classes = (AllowAny,)
 
     def get_user(self):
         return get_object_or_404(User, pk=self.kwargs.get('user_id'))
@@ -92,7 +93,7 @@ class RequestsViewSet(viewsets.ReadOnlyModelViewSet):
         methods=['POST']
     )
     def send_request(self, request, **kwargs):
-        data={
+        data = {
             'sender': self.get_user(),
             'recipient': self.request.data['recipient'],
         }

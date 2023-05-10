@@ -15,6 +15,7 @@ def username_validator(value):
         )
     return value
 
+
 def validate_of_date(value):
     current_date = timezone.now()
     if value > current_date:

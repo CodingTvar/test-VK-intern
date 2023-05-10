@@ -13,6 +13,12 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='friendshiprequest',
             name='status_req',
-            field=models.CharField(choices=[('send', 'отправить'), ('accept', 'принять'), ('friend', 'уже друзья')], max_length=24, verbose_name='Статус заявки'),
+            field=models.CharField(
+                choices=[('send', 'отправить'),
+                         ('accept', 'принять'),
+                         ('friend', 'уже друзья')],
+                max_length=24,
+                verbose_name='Статус заявки'
+            ),
         ),
     ]
