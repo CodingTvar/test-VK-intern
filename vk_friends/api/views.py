@@ -20,7 +20,7 @@ from api.serializers import (
     ProfileSerializer,
     ProfileCreateUpdateSerializer,
     FriendshipRequestSerializer,
-    RejectedRequestSerializer,
+    StatusFriendSerialiser,
 )
 from friends.models import User, Profile, FriendshipRequest
 
@@ -62,6 +62,34 @@ class ProfileViewSet(viewsets.ModelViewSet):
             return ProfileCreateUpdateSerializer
         return ProfileSerializer
 
+    @action(
+        detail=False,
+        methods=['GET'],
+        url_path=r'(?P<profile_id>\d+)/(?P<user_id>\d+)/status_friend',
+    )
+    def status_friend(self, request, *args, **kwargs):
+        profile = get_object_or_404(Profile, pk=self.kwargs.get('profile_id'))
+        get_req = get_object_or_404(FriendshipRequest,
+                                    sender=profile.get_user(),
+                                    recipient=self.kwargs.get('user_id'),)
+        if get_req is None:
+            get_req = get_object_or_404(FriendshipRequest,
+                                        sender=self.kwargs.get('user_id'),
+                                        recipient=profile.get_user(),)
+        data = {
+            'sender': get_req.get_sender(),
+            'recipient': get_req.get_recipient(),
+            'status_req': get_req.get_status_req(),
+#            'status_friend': '',
+        }
+        serializer = StatusFriendSerialiser(data=data,
+                                            queryset=FriendshipRequest.objects.all())
+        serializer.is_valid(raise_exception=True)
+#        sender = serializer.validated_data['sender']
+#        recipient = serializer.validated_data['recipient']
+#        status_req = serializer.validated_data['status_req']
+#        print(status_req)
+        return Response(serializer.data)
 
 class GetDeleteFriendViewSet(viewsets.ModelViewSet):
     http_method_names = ('get', 'delete')
@@ -69,7 +97,6 @@ class GetDeleteFriendViewSet(viewsets.ModelViewSet):
     permission_classes = (AllowAny,)
 
     def get_queryset(self):
-        # Переделать, работает не правильно
         profile = get_object_or_404(Profile, pk=self.kwargs.get('profile_id'))
         return profile.get_friends()
 
@@ -90,33 +117,6 @@ class SendRequestsViewSet(viewsets.ReadOnlyModelViewSet):
 
     def get_queryset(self):
         return FriendshipRequest.objects.filter(sender=self.get_user())
-
-    @action(
-        detail=False,
-        methods=['POST'],
-        url_path=r'(?P<recipient_id>\d+)/send_request',
-    )
-    def send_request(self, request, *args, **kwargs):
-        data = {
-            'sender': self.get_user(),
-            'recipient': get_object_or_404(User, pk=self.kwargs.get('recipient_id')),
-        }
-        serializer = self.get_serializer(data=data)
-        serializer.is_valid(raise_exception=True)
-        sender = serializer.validated_data['sender']
-        recipient = serializer.validated_data['recipient']
-        try:
-            frequest = FriendshipRequest.objects.create(
-                sender=sender,
-                recipient=recipient,
-                status_req='send',
-            )
-        except IntegrityError:
-            raise serializers.ValidationError(
-                {'message': 'Такая заявка уже есть'}
-            )
-        frequest.save()
-        return Response(serializer.data)
 
 
 class IncomeRequestsViewSet(viewsets.ReadOnlyModelViewSet):

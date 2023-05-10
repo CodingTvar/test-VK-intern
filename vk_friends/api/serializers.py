@@ -7,6 +7,14 @@ from friends.models import User, Profile, FriendshipRequest, STATUS_CHOICES
 from friends.validators import username_validator, validate_of_date
 
 
+STATUS_FRIEND = (
+    ('', 'нет ничего'),
+    ('send', 'есть исходящая заявка'),
+    ('income', 'есть входящая заявка'),
+    ('friend', 'уже друзья'),
+)
+
+
 class UserSerializer(serializers.ModelSerializer):
     username = serializers.CharField(
         max_length=settings.MAX_LENGTH_USERNAME,
@@ -68,7 +76,11 @@ class ProfileSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Profile
-        fields = ('user', 'friends', 'date_update', 'date_create')
+        fields = ('id',
+                  'user',
+                  'friends',
+                  'date_update',
+                  'date_create')
 
     def validate(self, data):
         if data == ('date_update' or 'date_create'):
@@ -119,6 +131,28 @@ class FriendshipRequestSerializer(serializers.ModelSerializer):
             )
         return data
 
+class StatusFriendSerialiser(serializers.ModelSerializer):
+    sender = UserSerializer(
+        read_only=True,
+        default=serializers.CurrentUserDefault(),
+    )
+    recipient = UserSerializer(
+        read_only=True,
+        default=serializers.CurrentUserDefault(),
+    )
+    status_friend = serializers.ChoiceField(
+        read_only=True,
+        choices=STATUS_FRIEND,
+    )
 
-class RejectedRequestSerializer(FriendshipRequestSerializer):
-    status_req = serializers.ChoiceField(choices=STATUS_CHOICES,)
+    class Meta:
+        model = FriendshipRequest
+        fields = ('id',
+                  'sender',
+                  'recipient',
+                  'status_req',
+                  'status_friend',)
+        read_only_fields = ('sender',
+                            'recipient',
+                            'status_req',
+                            'status_friend')

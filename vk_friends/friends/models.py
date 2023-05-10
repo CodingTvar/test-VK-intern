@@ -62,8 +62,11 @@ class Profile(models.Model):
         verbose_name = 'Профиль'
         verbose_name_plural = 'Профили'
 
-    def __str__(self) -> str:
+    def __str__(self):
         return self.user[:settings.TEXT_STR]
+
+    def get_user(self):
+        return self.user
 
     def get_friends(self):
         return self.friends.all()
