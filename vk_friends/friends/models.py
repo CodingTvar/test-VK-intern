@@ -6,8 +6,7 @@ from friends.validators import username_validator, validate_of_date
 
 STATUS_CHOICES = (
     ('send', 'отправлен'),
-    ('incoming', 'получен'),
-    ('friend', 'уже друзья'),
+    ('rejected', 'отказан'),
 )
 
 
@@ -87,6 +86,7 @@ class FriendshipRequest(models.Model):
         verbose_name='Статус заявки',
         max_length=settings.MAX_STATUS,
         choices=STATUS_CHOICES,
+        blank=False,
     )
     date_update = models.DateTimeField(
         verbose_name='Дата обновления',
@@ -108,7 +108,19 @@ class FriendshipRequest(models.Model):
         verbose_name = 'Заявка в друзья'
         verbose_name_plural = 'Заявки в друзья'
 
-    def __str__(self) -> str:
-        return (f'Заявка в друзья от {self.sender} '
-                f'отправлена {self.recipient} '
-                f'со статусом {self.status_req}')
+    def __str__(self):
+        return (f'Отправитель: {self.sender} '
+                f'Получатель: {self.recipient} '
+                f'Статус: {self.status_req}')
+    
+    def get_sender(self):
+        return self.sender
+    
+    def get_recipient(self):
+        return self.recipient
+    
+    def get_status_req(self):
+        return self.status_req
+
+    def reject_status_req(self):
+        return self.status_req['rejected']

@@ -89,11 +89,12 @@ class FriendshipRequestSerializer(serializers.ModelSerializer):
     )
     status_req = serializers.ChoiceField(
         read_only=True,
-        choices=STATUS_CHOICES)
+        choices=STATUS_CHOICES,)
 
     class Meta:
         model = FriendshipRequest
-        fields = ('sender',
+        fields = ('id',
+                  'sender',
                   'recipient',
                   'status_req',
                   'date_update',
@@ -104,7 +105,6 @@ class FriendshipRequestSerializer(serializers.ModelSerializer):
         request = self.context.get('request')
         if request.method != 'POST':
             return data
-        print(data)
         if data['sender'] == data['recipient']:
             raise serializers.ValidationError(
                 'Вы не можете отправлять себе заявку в друзья'
@@ -118,3 +118,7 @@ class FriendshipRequestSerializer(serializers.ModelSerializer):
                 'больше одной заявки в друзья'
             )
         return data
+
+
+class RejectedRequestSerializer(FriendshipRequestSerializer):
+    status_req = serializers.ChoiceField(choices=STATUS_CHOICES,)
