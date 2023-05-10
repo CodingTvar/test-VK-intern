@@ -48,6 +48,10 @@ class Profile(models.Model):
     )
 
     class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=['user'],
+                                    name='unique_user')
+        ]
         ordering = ('user',)
         verbose_name = 'Профиль'
         verbose_name_plural = 'Профили'
