@@ -5,7 +5,8 @@ from api.views import (SignUpViewSet,
                        UserViewSet,
                        ProfileViewSet,
                        GetDeleteFriendViewSet,
-                       RequestsViewSet,)
+                       SendRequestsViewSet,
+                       IncomeRequestsViewSet,)
 
 
 router_v1 = DefaultRouter()
@@ -14,9 +15,12 @@ router_v1.register(r'profiles', ProfileViewSet, basename='profiles')
 router_v1.register(r'profiles/(?P<profile_id>\d+)/friends',
                    GetDeleteFriendViewSet,
                    basename='friends')
-router_v1.register(r'users/(?P<user_id>\d+)/requests',
-                   RequestsViewSet,
-                   basename='requests')
+router_v1.register(r'users/(?P<user_id>\d+)/send_requests',
+                   SendRequestsViewSet,
+                   basename='send_requests')
+router_v1.register(r'users/(?P<user_id>\d+)/incoming_requests',
+                   IncomeRequestsViewSet,
+                   basename='send_requests')
 
 auth_patterns = [
     path('signup/', SignUpViewSet.as_view())

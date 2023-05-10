@@ -63,12 +63,13 @@ class ProfileViewSet(viewsets.ModelViewSet):
 
 class GetDeleteFriendViewSet(viewsets.ModelViewSet):
     http_method_names = ('get', 'delete')
-    serializer_class = UserSerializer
+    serializer_class = ProfileSerializer
     lookup_field = 'user'
     permission_classes = (AllowAny,)
 
     def get_queryset(self):
-        return Profile.friends.filter(pk=self.kwargs.get('profile_id'))
+        # Переделать, работает не правильно
+        return Profile.objects.filter(pk=self.kwargs.get('profile_id'))
 
     def destroy(self, request, *args, **kwargs):
         # serializer_prof = ProfileSerializer(data=request.data)
@@ -77,9 +78,10 @@ class GetDeleteFriendViewSet(viewsets.ModelViewSet):
         return Response()
 
 
-class RequestsViewSet(viewsets.ReadOnlyModelViewSet):
+class SendRequestsViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = FriendshipRequestSerializer
     # IsAdminAuthor с аутентификацией
+    lookup_field = 'req_id'
     permission_classes = (AllowAny,)
 
     def get_user(self):
@@ -113,3 +115,24 @@ class RequestsViewSet(viewsets.ReadOnlyModelViewSet):
             )
         frequest.save()
         return Response(serializer.data)
+
+
+class IncomeRequestsViewSet(viewsets.ReadOnlyModelViewSet):
+    serializer_class = FriendshipRequestSerializer
+    # IsAdminAuthor с аутентификацией
+    lookup_field = 'req_id'
+    permission_classes = (AllowAny,)
+
+    def get_user(self):
+        return get_object_or_404(User, pk=self.kwargs.get('user_id'))
+
+    def get_queryset(self):
+        return FriendshipRequest.objects.filter(recipient=self.get_user())
+
+    @action(
+        detail=False,
+        methods=['POST'],
+        url_path=r'(?P<req_id>\d+)/status_request',
+    )
+    def status_request(self, request, **kwargs):
+        pass
