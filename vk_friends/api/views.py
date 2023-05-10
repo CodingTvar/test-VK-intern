@@ -51,7 +51,7 @@ class ProfileViewSet(viewsets.ModelViewSet):
     http_method_names = ('get', 'post', 'delete', 'patch')
     queryset = Profile.objects.all()
     serializer_class = ProfileSerializer
-    lookup_field = 'user'
+#    lookup_field = 'user'
     # IsAdminAuthorOrReadOnly c аутентификацией
     permission_classes = (AllowAny,)
 
@@ -64,7 +64,6 @@ class ProfileViewSet(viewsets.ModelViewSet):
 class GetDeleteFriendViewSet(viewsets.ModelViewSet):
     http_method_names = ('get', 'delete')
     serializer_class = ProfileSerializer
-    lookup_field = 'user'
     permission_classes = (AllowAny,)
 
     def get_queryset(self):
@@ -81,7 +80,7 @@ class GetDeleteFriendViewSet(viewsets.ModelViewSet):
 class SendRequestsViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = FriendshipRequestSerializer
     # IsAdminAuthor с аутентификацией
-    lookup_field = 'req_id'
+    lookup_field = 'id'
     permission_classes = (AllowAny,)
 
     def get_user(self):
@@ -120,7 +119,7 @@ class SendRequestsViewSet(viewsets.ReadOnlyModelViewSet):
 class IncomeRequestsViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = FriendshipRequestSerializer
     # IsAdminAuthor с аутентификацией
-    lookup_field = 'req_id'
+    lookup_field = 'id'
     permission_classes = (AllowAny,)
 
     def get_user(self):
